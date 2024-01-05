@@ -9,7 +9,7 @@ from .config import settings
 from .models import ExportDataset, ExportImage, Exports, Link
 from .proxyimage import ome_zarr_image_from_ome_zarr_uri
 
-
+ITK_BASE="https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad="
 VIZARR_BASE="https://uk1s3.embassy.ebi.ac.uk/bia-zarr-test/vizarr/index.html?source="
 
 
@@ -102,6 +102,7 @@ def bia_image_to_export_image(image, study):
         study_accession_id=study.accession_id,
         study_title=study.title,
         release_date=study.release_date,
+        itk_uri=ITK_BASE + reps_by_type["ome_ngff"].uri[0],
         vizarr_uri=VIZARR_BASE + reps_by_type["ome_ngff"].uri[0],
         sizeX=im.sizeX,
         sizeY=im.sizeY,
@@ -133,6 +134,7 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
     images = get_images_with_a_rep_type(study_uuid, "ome_ngff")
     transform_dict = transform_study_dict(bia_study)
+    rich.print(transform_dict)
     transform_dict["image_uuids"] = [image.uuid for image in images]
     transform_dict["links"] = [
         Link(
@@ -156,10 +158,21 @@ def study_uuid_to_export_images(study_uuid):
 
 
 @app.command()
+def show_export(accession_id: str):
+    study_uuid = get_study_uuid_by_accession_id(accession_id)
+    api_study = rw_client.get_study(study_uuid)
+
+    export_dataset = study_uuid_to_export_dataset(study_uuid)
+
+    # rich.print(api_study)
+    # rich.print(export_dataset)
+
+
+@app.command()
 def export_defaults(output_filename: Path = Path("bia-export.json")):
 
     accession_ids = [
-        "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425", "S-BIAD582",
+        "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425", "S-BIAD582", "S-BIAD606",
         "S-BIAD608", "S-BIAD620", "S-BIAD661", "S-BIAD626",
         "S-BIAD627", "S-BIAD916", "S-BIAD952", "S-BIAD961", "S-BIAD963", "S-BIAD968"
     ]

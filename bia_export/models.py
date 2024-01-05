@@ -18,7 +18,10 @@ class ExportImage(BaseModel):
     original_relpath: str
     study_title: str
     release_date: str
+
     vizarr_uri: str
+    itk_uri: str | None
+
     study_accession_id: str
     thumbnail_uri: str
 
