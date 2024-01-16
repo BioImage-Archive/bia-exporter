@@ -31,6 +31,10 @@ class ExportImage(BaseModel):
     sizeC: int = 1
     sizeT: int = 1
 
+    source_image_uuid: str = None
+    source_image_thumbnail_uri: str = None
+    overlay_image_uri: str = None
+
     PhysicalSizeX: Optional[float] = None
     PhysicalSizeY: Optional[float] = None
     PhysicalSizeZ: Optional[float] = None

@@ -43,7 +43,25 @@ def get_images_with_a_rep_type(study_uuid, rep_type, limit=5):
             )],
             study_uuid=study_uuid,
             limit=limit
-        )
+        ),
+        apply_annotations=True
     )
 
     return images
+
+
+def get_image_by_accession_id_and_relpath(accession_id: str, relpath: str):
+    study_uuid = get_study_uuid_by_accession_id(accession_id)
+
+    search_filter = api_models.SearchImageFilter(
+        study_uuid=study_uuid,
+        original_relpath=relpath
+    )
+
+    images = rw_client.search_images_exact_match(
+        search_filter,
+        apply_annotations=True
+    )
+
+    if len(images):
+        return images[0]

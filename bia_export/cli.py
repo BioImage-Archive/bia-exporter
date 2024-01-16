@@ -4,7 +4,7 @@ from typing import Dict
 import rich
 import typer
 
-from .scli import rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type
+from .scli import rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, get_image_by_accession_id_and_relpath
 from .config import settings
 from .models import ExportDataset, ExportImage, Exports, Link
 from .proxyimage import ome_zarr_image_from_ome_zarr_uri
@@ -53,31 +53,13 @@ def transform_study_dict(bia_study):
     return base_dict
 
 
-def transform(bia_study):
-    keys = [
-        'accession_id',
-        'title',
-        'release_date',
-        'example_image_uri',
-        'imaging_type',
-        'organism'
-    ]
-    base_dict = {
-        key: bia_study.__dict__[key]
-        for key in keys
-    }
-
-    base_dict['n_images'] = bia_study.images_count
-
-    return base_dict
-
-
-def bia_image_to_export_image(image, study):
+def bia_image_to_export_image(image, study, use_cache=True):
 
     output_dirpath = settings.cache_root_dirpath / "images"
     output_dirpath.mkdir(exist_ok=True, parents=True)
     output_fpath = output_dirpath / f"{image.uuid}.json"
-    if output_fpath.exists():
+
+    if use_cache and output_fpath.exists():
         return ExportImage.parse_file(output_fpath)
     
     reps_by_type = {
@@ -92,6 +74,11 @@ def bia_image_to_export_image(image, study):
         thumbnail_uri=reps_by_type["thumbnail"].uri[0]
     except KeyError:
         thumbnail_uri = ""
+
+    # FIXME - should generalise this
+    source_image_uuid = image.attributes.get("source_image_uuid", None)
+    source_image_thumbnail_uri = image.attributes.get("source_image_thumbnail_uri", None)
+    overlay_image_uri = image.attributes.get("overlay_image_uri", None)
 
     export_im = ExportImage(
         uuid=image.uuid,
@@ -112,6 +99,9 @@ def bia_image_to_export_image(image, study):
         PhysicalSizeX=im.PhysicalSizeX,
         PhysicalSizeY=im.PhysicalSizeY,
         PhysicalSizeZ=im.PhysicalSizeZ,
+        source_image_uuid=source_image_uuid,
+        source_image_thumbnail_uri=source_image_thumbnail_uri,
+        overlay_image_uri=overlay_image_uri,
         attributes=filter_image_attributes(image)
     )
 
@@ -130,11 +120,10 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
     if output_fpath.exists():
         return ExportDataset.parse_file(output_fpath)
 
-    bia_study = rw_client.get_study(study_uuid)
+    bia_study = rw_client.get_study(study_uuid, apply_annotations=True)
 
     images = get_images_with_a_rep_type(study_uuid, "ome_ngff")
     transform_dict = transform_study_dict(bia_study)
-    rich.print(transform_dict)
     transform_dict["image_uuids"] = [image.uuid for image in images]
     transform_dict["links"] = [
         Link(
@@ -152,7 +141,7 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
 def study_uuid_to_export_images(study_uuid):
     study = rw_client.get_study(study_uuid)
-    images = get_images_with_a_rep_type(study_uuid, "ome_ngff")
+    images = get_images_with_a_rep_type(study_uuid, "ome_ngff", limit=500)
     
     return {image.uuid: bia_image_to_export_image(image, study) for image in images}
 
@@ -168,13 +157,30 @@ def show_export(accession_id: str):
     # rich.print(export_dataset)
 
 
+# @app.command()
+# def 
+# def show_image_export(accession_id: str, image_relpath: str):
+    # image = get_image_by_accession_id_and_relpath(accession_id, image_relpath)
+@app.command()
+def show_image_export(accession_id: str, image_uuid: str):
+    study_uuid = get_study_uuid_by_accession_id(accession_id)
+    study = rw_client.get_study(study_uuid, apply_annotations=True)
+    image = rw_client.get_image(image_uuid, apply_annotations=True)
+    export_image = bia_image_to_export_image(image, study, use_cache=False)
+    rich.print(export_image)
+
+
+
 @app.command()
 def export_defaults(output_filename: Path = Path("bia-export.json")):
 
     accession_ids = [
-        "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425", "S-BIAD582", "S-BIAD606",
-        "S-BIAD608", "S-BIAD620", "S-BIAD661", "S-BIAD626",
-        "S-BIAD627", "S-BIAD916", "S-BIAD952", "S-BIAD961", "S-BIAD963", "S-BIAD968"
+        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
+        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
+        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
+        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
+        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
+        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008"
     ]
 
     study_accession_ids_to_export = accession_ids
