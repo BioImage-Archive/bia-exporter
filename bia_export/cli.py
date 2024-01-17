@@ -6,7 +6,7 @@ import typer
 
 from .scli import rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, get_image_by_accession_id_and_relpath
 from .config import settings
-from .models import ExportDataset, ExportImage, Exports, Link
+from .models import ExportDataset, ExportAIDataset, ExportImage, Exports, Link
 from .proxyimage import ome_zarr_image_from_ome_zarr_uri
 
 ITK_BASE="https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad="
@@ -52,6 +52,28 @@ def transform_study_dict(bia_study):
 
     return base_dict
 
+def transform_ai_study_dict(bia_study):
+    keys = [
+        'accession_id',
+        'title',
+        'release_date',
+        'example_image_uri',
+        'imaging_type',
+        'organism',
+        'example_annotation_uri',
+        'annotation_type',
+        'annotation_method',
+        'models_description',
+        'models_uri'
+    ]
+    base_dict = {
+        key: bia_study.__dict__[key]
+        for key in keys
+    }
+
+    base_dict['n_images'] = bia_study.images_count
+
+    return base_dict
 
 def bia_image_to_export_image(image, study, use_cache=True):
 
@@ -138,6 +160,33 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
     return ExportDataset(**transform_dict)
 
+# FIXME - we get images twice...
+def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
+
+    output_dirpath = settings.cache_root_dirpath / "datasets"
+    output_dirpath.mkdir(exist_ok=True, parents=True)
+    output_fpath = output_dirpath / f"{study_uuid}.json"
+    if output_fpath.exists():
+        return ExportDataset.parse_file(output_fpath)
+
+    bia_study = rw_client.get_study(study_uuid, apply_annotations=True)
+
+    images = get_images_with_a_rep_type(study_uuid, "ome_ngff")
+    transform_dict = transform_study_dict(bia_study)
+    transform_dict["image_uuids"] = [image.uuid for image in images]
+    transform_dict["links"] = [
+        Link(
+            name="original_submission",
+            type="original_submission",
+            url=f"https://www.ebi.ac.uk/biostudies/BioImages/studies/{bia_study.accession_id}"
+        )
+    ]
+
+    with open(output_fpath, "w") as fh:
+        fh.write(ExportAIDataset(**transform_dict).json(indent=2))
+
+    return ExportAIDataset(**transform_dict)
+
 
 def study_uuid_to_export_images(study_uuid):
     study = rw_client.get_study(study_uuid)
@@ -154,7 +203,7 @@ def show_export(accession_id: str):
     export_dataset = study_uuid_to_export_dataset(study_uuid)
 
     # rich.print(api_study)
-    # rich.print(export_dataset)
+    rich.print(export_dataset)
 
 
 # @app.command()
@@ -208,6 +257,37 @@ def export_defaults(output_filename: Path = Path("bia-export.json")):
     with open(output_filename, "w") as fh:
         fh.write(exports.json(indent=2))
 
+@app.command()
+def ai_datasets(output_filename: Path = Path("bia-ai-export.json")):
+
+    accession_ids = [
+        "S-BIAD531", "S-BIAD599", "S-BIAD463", "S-BIAD634", "S-BIAD686", "S-BIAD493"
+    ]
+
+    study_accession_ids_to_export = accession_ids
+
+    study_uuids_by_accession_id = {
+        accession_id: get_study_uuid_by_accession_id(accession_id)
+        for accession_id in study_accession_ids_to_export
+    }
+
+    export_datasets = {
+        accession_id: study_uuid_to_export_ai_dataset(uuid)
+        for accession_id, uuid in study_uuids_by_accession_id.items()
+    }
+
+    export_images = {}
+    for study_uuid in study_uuids_by_accession_id.values():
+        new_export_images = study_uuid_to_export_images(study_uuid)
+        export_images.update(new_export_images)
+
+    exports = Exports(
+        datasets=export_datasets,
+        images=export_images
+    )
+
+    with open(output_filename, "w") as fh:
+        fh.write(exports.json(indent=2))
 
 if __name__ == "__main__":
     app()
