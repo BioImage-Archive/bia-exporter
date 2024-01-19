@@ -1,5 +1,3 @@
 __pycache__
 .venv
 .env
-poetry.lock
-.DS_Store
