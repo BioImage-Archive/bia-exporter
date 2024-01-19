@@ -179,7 +179,7 @@ def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
     bia_study = rw_client.get_study(study_uuid, apply_annotations=True)
 
     images = get_images_with_a_rep_type(study_uuid, "ome_ngff")
-    transform_dict = transform_study_dict(bia_study)
+    transform_dict = transform_ai_study_dict(bia_study)
     transform_dict["image_uuids"] = [image.uuid for image in images]
     transform_dict["links"] = [
         Link(
