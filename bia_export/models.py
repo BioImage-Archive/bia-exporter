@@ -77,7 +77,7 @@ class ExportAIDataset(BaseModel):
 class Exports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
-    datasets: Dict[str, ExportDataset]
+    datasets: Dict[str, ExportDataset] = {}
 
 class AIExports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
