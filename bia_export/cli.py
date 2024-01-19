@@ -6,7 +6,7 @@ import typer
 
 from .scli import rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, get_image_by_accession_id_and_relpath
 from .config import settings
-from .models import ExportDataset, ExportAIDataset, ExportImage, Exports, Link
+from .models import ExportDataset, ExportAIDataset, ExportImage, Exports, AIExports, Link
 from .proxyimage import ome_zarr_image_from_ome_zarr_uri
 
 ITK_BASE="https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad="
@@ -59,17 +59,24 @@ def transform_ai_study_dict(bia_study):
         'release_date',
         'example_image_uri',
         'imaging_type',
-        'organism',
+        'organism'
+    ]
+    base_dict = {
+        key: bia_study.__dict__[key]
+        for key in keys
+    }
+
+    keys2 = [
         'example_annotation_uri',
         'annotation_type',
         'annotation_method',
         'models_description',
         'models_uri'
     ]
-    base_dict = {
-        key: bia_study.__dict__[key]
-        for key in keys
-    }
+    base_dict.update({
+        key: bia_study.attributes.__dict__[key]
+        for key in keys2
+    })
 
     base_dict['n_images'] = bia_study.images_count
 
@@ -281,7 +288,7 @@ def ai_datasets(output_filename: Path = Path("bia-ai-export.json")):
         new_export_images = study_uuid_to_export_images(study_uuid)
         export_images.update(new_export_images)
 
-    exports = Exports(
+    exports = AIExports(
         datasets=export_datasets,
         images=export_images
     )
