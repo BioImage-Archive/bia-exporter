@@ -74,7 +74,7 @@ def transform_ai_study_dict(bia_study):
         'models_uri'
     ]
     base_dict.update({
-        key: bia_study.attributes.__dict__[key]
+        key: bia_study.attributes.get(key)
         for key in keys2
     })
 
