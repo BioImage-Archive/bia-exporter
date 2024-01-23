@@ -58,9 +58,28 @@ class ExportDataset(BaseModel):
     image_uuids: List[str]
     links: List[Link] = []
 
+class ExportAIDataset(BaseModel):
+    accession_id: str
+    title: str
+    release_date: str
+    example_image_uri: str
+    imaging_type: str
+    organism: str
+    annotation_type: Optional[str] = None
+    annotation_method: Optional[str] = None
+    example_annotation_uri: Optional[str] = None
+    models_description: Optional[str] = None
+    models_uri: Optional[str] = None
+    n_images: int
+    image_uuids: List[str]
+    links: List[Link] = []
 
 class Exports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
-    datasets: Dict[str, ExportDataset]
+    datasets: Dict[str, ExportDataset] = {}
 
+class AIExports(BaseModel):
+    collections: Dict[str, ExportCollection] = {}
+    images: Dict[str, ExportImage]
+    datasets: Dict[str, ExportAIDataset]
