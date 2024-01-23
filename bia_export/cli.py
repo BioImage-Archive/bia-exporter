@@ -4,7 +4,10 @@ from typing import Dict
 import rich
 import typer
 
-from .scli import rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, get_image_by_accession_id_and_relpath
+from .scli import (rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, 
+                   get_file_references_by_study_uuid,
+                   get_annotation_file_uuids_by_study_uuid,
+                   get_image_by_accession_id_and_relpath)
 from .config import settings
 from .models import ExportDataset, ExportAIDataset, ExportImage, Exports, AIExports, Link
 from .proxyimage import ome_zarr_image_from_ome_zarr_uri
@@ -139,6 +142,64 @@ def bia_image_to_export_image(image, study, use_cache=True):
 
     return export_im
 
+def fileref_to_export_annotations(fileref, use_cache=True):
+
+    output_dirpath = settings.cache_root_dirpath / "images"
+    output_dirpath.mkdir(exist_ok=True, parents=True)
+    output_fpath = output_dirpath / f"{fileref.uuid}.json"
+
+    if use_cache and output_fpath.exists():
+        return ExportImage.parse_file(output_fpath)
+    
+    # reps_by_type = {
+    #     rep.type: rep
+    #     for rep in image.representations
+    # }
+
+    # ome_zarr_uri = reps_by_type["ome_ngff"].uri[0]
+    # im = ome_zarr_image_from_ome_zarr_uri(ome_zarr_uri)
+
+    # try:
+    #     thumbnail_uri=reps_by_type["thumbnail"].uri[0]
+    # except KeyError:
+    #     thumbnail_uri = ""
+
+    # FIXME - should generalise this
+    # source_image_uuid = image.attributes.get("source_image_uuid", None)
+    # source_image_thumbnail_uri = image.attributes.get("source_image_thumbnail_uri", None)
+    # overlay_image_uri = image.attributes.get("overlay_image_uri", None)
+
+    # export_ann = ExportAnnotationFile(
+    #     uuid=fileref.uuid,
+    #     name=Path(fileref.name).name,
+    #     alias=fileref.attributes.get("alias"),
+    #     thumbnail_uri=thumbnail_uri,
+    #     study_accession_id=study.accession_id,
+    #     study_title=study.title,
+    #     release_date=study.release_date,
+    #     itk_uri=ITK_BASE + reps_by_type["ome_ngff"].uri[0],
+    #     vizarr_uri=VIZARR_BASE + reps_by_type["ome_ngff"].uri[0],
+    #     sizeX=im.sizeX,
+    #     sizeY=im.sizeY,
+    #     sizeZ=im.sizeZ,
+    #     sizeT=im.sizeT,
+    #     sizeC=im.sizeC,
+    #     PhysicalSizeX=im.PhysicalSizeX,
+    #     PhysicalSizeY=im.PhysicalSizeY,
+    #     PhysicalSizeZ=im.PhysicalSizeZ,
+    #     source_image_uuid=source_image_uuid,
+    #     source_image_thumbnail_uri=source_image_thumbnail_uri,
+    #     overlay_image_uri=overlay_image_uri,
+    #     attributes=filter_image_attributes(image)
+    # )
+
+    # FIXME - Write the proper export_ann 
+    export_ann = None
+
+    with open(output_fpath, "w") as fh:
+        fh.write(export_ann.json(indent=2))
+
+    return export_ann
 
 # FIXME - we get images twice...
 def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
@@ -188,6 +249,28 @@ def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
             url=f"https://www.ebi.ac.uk/biostudies/BioImages/studies/{bia_study.accession_id}"
         )
     ]
+    transform_dict["annfile_uuids"] = get_annotation_file_uuids_by_study_uuid(study_uuid)
+    
+    rich.print(get_file_references_by_study_uuid(study_uuid))
+    
+    annotation_files = get_annotation_files_by_study_uuid(study_uuid)
+    
+    ann_aliases_by_sourcename = get_ann_aliases_by_sourcename(annotation_files)
+
+    transform_dict["corresponding_ann_aliases"] = {
+        image.uuid: ann_aliases_by_sourcename.get(image.name)
+        for image in bia_study.images
+    }
+
+    im_aliases_by_name = {
+        image.name: image.alias.name if image.alias.name else ""
+        for image in bia_study.images
+    }
+
+    transform_dict["corresponding_im_aliases"] ={
+        annfile.attributes['alias'] : im_aliases_by_name.get(annfile.attributes['source image'])
+        for annfile in annotation_files
+    }
 
     with open(output_fpath, "w") as fh:
         fh.write(ExportAIDataset(**transform_dict).json(indent=2))
@@ -201,6 +284,20 @@ def study_uuid_to_export_images(study_uuid):
     
     return {image.uuid: bia_image_to_export_image(image, study) for image in images}
 
+def get_annotation_files_by_study_uuid(study_uuid):
+    file_refs = get_file_references_by_study_uuid(study_uuid)
+    return {fileref.uuid: fileref for fileref in file_refs
+        if "source image" in fileref.attributes
+    }
+
+def get_ann_aliases_by_sourcename(annotation_files):
+    ann_aliases_by_sourcename = {}
+    for annfile in annotation_files:
+        if ann_aliases_by_sourcename.get(annfile.attributes['source image']):
+            ann_aliases_by_sourcename[annfile.attributes['source image']] += ', ' + annfile.attributes['alias']
+        else:
+            ann_aliases_by_sourcename[annfile.attributes['source image']] = annfile.attributes['alias'] 
+    return ann_aliases_by_sourcename
 
 @app.command()
 def show_export(accession_id: str):
@@ -326,6 +423,32 @@ def ai_datasets(output_filename: Path = Path("bia-ai-export.json")):
 
     with open(output_filename, "w") as fh:
         fh.write(exports.json(indent=2))
+
+@app.command()
+def annotation_files(output_filename: Path = Path("bia-annotation_files.json")):
+
+    accession_ids = [
+        "S-BIAD531", "S-BIAD599", "S-BIAD463", "S-BIAD634", "S-BIAD686", "S-BIAD493"
+    ]
+
+    study_accession_ids_to_export = accession_ids
+
+    study_uuids_by_accession_id = {
+        accession_id: get_study_uuid_by_accession_id(accession_id)
+        for accession_id in study_accession_ids_to_export
+    }
+
+    export_annotfiles = {}
+    for study_uuid in study_uuids_by_accession_id.values():
+        study_filerefs = get_file_references_by_study_uuid(study_uuid)
+        export_filerefs = {fileref.uuid: fileref_to_export_annotations(fileref) for fileref in study_filerefs}
+        export_annotfiles.update(export_filerefs)
+
+    # FIXME - Write the proper export call
+    exports = None
+    with open(output_filename, "w") as fh:
+        fh.write(exports.json(indent=2))
+
 
 if __name__ == "__main__":
     app()

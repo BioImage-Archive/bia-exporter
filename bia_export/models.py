@@ -73,6 +73,9 @@ class ExportAIDataset(BaseModel):
     n_images: int
     image_uuids: List[str]
     links: List[Link] = []
+    annfile_uuids: List[str]
+    corresponding_ann_aliases: Dict[str, str] = {}
+    corresponding_im_aliases: Dict[str, str] = {}
 
 class Exports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
