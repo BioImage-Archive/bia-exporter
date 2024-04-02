@@ -1,5 +1,6 @@
 import logging
 
+from pathlib import Path
 from pydantic import BaseSettings
 
 from bia_integrator_api.util import simple_client
@@ -9,19 +10,19 @@ logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
-    api_base_url: str = 'https://bia-cron-1.ebi.ac.uk:8080'
+    bia_api_basepath: str = 'https://bia-cron-1.ebi.ac.uk:8080'
     bia_username: str = None
     bia_password: str = None
     disable_ssl_host_check: bool = True
 
     class Config:
-        env_file = '.env'
+        env_file = f"{Path(__file__).parent.parent / '.env'}"
 
 
 settings = Settings()
 
 rw_client = simple_client(
-    api_base_url=settings.api_base_url,
+    api_base_url=settings.bia_api_basepath,
     username=settings.bia_username,
     password=settings.bia_password,
     disable_ssl_host_check=settings.disable_ssl_host_check
