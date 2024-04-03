@@ -109,6 +109,18 @@ def bia_image_to_export_image(image, study, use_cache=True):
     source_image_thumbnail_uri = image.attributes.get("source_image_thumbnail_uri", None)
     overlay_image_uri = image.attributes.get("overlay_image_uri", None)
 
+    # Refactor so titles and child uuids obtained in same API call - for loop
+    # Get BioSample, Specimen and ImageAcquisition
+    specimen_uuids = []
+    specimen_uuids.extend([rw_client.get_image_acquisition(image_acquisition_method_uuid).specimen_uuid for image_acquisition_method_uuid in image.image_acquisition_methods_uuid])
+
+    biosample_uuids = []
+    biosample_uuids.extend([rw_client.get_specimen(specimen_uuid).biosample_uuid for specimen_uuid in specimen_uuids])
+    
+    image_acquisition_title = " ".join([rw_client.get_image_acquisition(uuid).title for uuid in image.image_acquisition_methods_uuid])
+    specimen_title = " ".join([rw_client.get_specimen(uuid).title for uuid in specimen_uuids])
+    biosample_title = " ".join([rw_client.get_biosample(uuid).title for uuid in biosample_uuids])
+    
     export_im = ExportImage(
         uuid=image.uuid,
         name=Path(image.name).name,
@@ -131,6 +143,9 @@ def bia_image_to_export_image(image, study, use_cache=True):
         source_image_uuid=source_image_uuid,
         source_image_thumbnail_uri=source_image_thumbnail_uri,
         overlay_image_uri=overlay_image_uri,
+        biosample_title=biosample_title,
+        specimen_title=specimen_title,
+        image_acquisition_title=image_acquisition_title,
         attributes=filter_image_attributes(image)
     )
 
@@ -164,6 +179,7 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
     with open(output_fpath, "w") as fh:
         fh.write(ExportDataset(**transform_dict).json(indent=2))
+        print(f"Saved to {output_fpath}")
 
     return ExportDataset(**transform_dict)
 

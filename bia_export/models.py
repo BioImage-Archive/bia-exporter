@@ -39,6 +39,10 @@ class ExportImage(BaseModel):
     PhysicalSizeY: Optional[float] = None
     PhysicalSizeZ: Optional[float] = None
 
+    biosample_title: Optional[str] = None
+    specimen_title:  Optional[str] = None
+    image_acquisition_title: Optional[str] = None
+
     attributes: Dict[str, str | None]
 
 
