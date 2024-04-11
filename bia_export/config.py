@@ -12,8 +12,13 @@ class Settings(BaseSettings):
     bioformats2raw_bin: str = ""
     config_fpath: Path = Path("dome.yaml")
 
+    bia_api_basepath: str = 'https://bia-cron-1.ebi.ac.uk:8080'
+    bia_username: str = None
+    bia_password: str = None
+    disable_ssl_host_check: bool = True
+
     class Config:
-        env_file = '.env'
+        env_file = f"{Path(__file__).parent.parent / '.env'}"
 
 settings = Settings()
 
