@@ -82,7 +82,7 @@ def transform_ai_study_dict(bia_study):
 
     return base_dict
 
-def bia_image_to_export_image(image, study, use_cache=True):
+def bia_image_to_export_image(image, study, use_cache=False):
 
     output_dirpath = settings.cache_root_dirpath / "images"
     output_dirpath.mkdir(exist_ok=True, parents=True)
@@ -109,18 +109,6 @@ def bia_image_to_export_image(image, study, use_cache=True):
     source_image_thumbnail_uri = image.attributes.get("source_image_thumbnail_uri", None)
     overlay_image_uri = image.attributes.get("overlay_image_uri", None)
 
-    # Refactor so titles and child uuids obtained in same API call - for loop
-    # Get BioSample, Specimen and ImageAcquisition
-    specimen_uuids = []
-    specimen_uuids.extend([rw_client.get_image_acquisition(image_acquisition_method_uuid).specimen_uuid for image_acquisition_method_uuid in image.image_acquisition_methods_uuid])
-
-    biosample_uuids = []
-    biosample_uuids.extend([rw_client.get_specimen(specimen_uuid).biosample_uuid for specimen_uuid in specimen_uuids])
-    
-    image_acquisition_title = " ".join([rw_client.get_image_acquisition(uuid).title for uuid in image.image_acquisition_methods_uuid])
-    specimen_title = " ".join([rw_client.get_specimen(uuid).title for uuid in specimen_uuids])
-    biosample_title = " ".join([rw_client.get_biosample(uuid).title for uuid in biosample_uuids])
-    
     export_im = ExportImage(
         uuid=image.uuid,
         name=Path(image.name).name,
@@ -143,11 +131,45 @@ def bia_image_to_export_image(image, study, use_cache=True):
         source_image_uuid=source_image_uuid,
         source_image_thumbnail_uri=source_image_thumbnail_uri,
         overlay_image_uri=overlay_image_uri,
-        biosample_title=biosample_title,
-        specimen_title=specimen_title,
-        image_acquisition_title=image_acquisition_title,
+
         attributes=filter_image_attributes(image)
     )
+
+
+
+
+    # Refactor so titles and child uuids obtained in same API call - for loop
+    # Get BioSample, Specimen and ImageAcquisition
+    specimen_uuids = []
+    specimen_uuids.extend([rw_client.get_image_acquisition(image_acquisition_method_uuid).specimen_uuid for image_acquisition_method_uuid in image.image_acquisition_methods_uuid])
+
+    biosample_uuids = []
+    biosample_uuids.extend([rw_client.get_specimen(specimen_uuid).biosample_uuid for specimen_uuid in specimen_uuids])
+    
+    if len(image.image_acquisition_methods_uuid) > 0:
+        image_acquisition = rw_client.get_image_acquisition(image.image_acquisition_methods_uuid[0])
+        export_im.image_acquisition_title = image_acquisition.title
+        export_im.image_acquisition_imaging_instrument = image_acquisition.imaging_instrument
+        export_im.image_acquisition_image_acquisition_parameters = image_acquisition.image_acquisition_parameters
+        export_im.image_acquisition_imaging_method = image_acquisition.imaging_method
+    
+    if len(specimen_uuids) > 0:
+        specimen = rw_client.get_specimen(specimen_uuids[0])
+        export_im.specimen_title = specimen.title
+        export_im.specimen_sample_preparation_protocol = specimen.sample_preparation_protocol
+        export_im.specimen_growth_protocol = specimen.growth_protocol
+
+    if len(biosample_uuids) > 0:
+        biosample = rw_client.get_biosample(biosample_uuids[0]).__dict__
+        export_im.biosample_title = biosample["title"]
+        export_im.biosample_organism_scientific_name = biosample["organism_scientific_name"]
+        export_im.biosample_organism_common_name = biosample["organism_common_name"]
+        export_im.biosample_organism_ncbi_taxon = biosample["organism_ncbi_taxon"]
+        export_im.biosample_description = biosample["description"]
+        export_im.biosample_biological_entity = biosample["biological_entity"]
+        export_im.biosample_experimental_variables = ", ".join(biosample["experimental_variables"])
+        export_im.biosample_extrinsic_variables = ", ".join(biosample["extrinsic_variables"])
+        export_im.biosample_intrinsic_variables = ", ".join(biosample["intrinsic_variables"])
 
     with open(output_fpath, "w") as fh:
         fh.write(export_im.json(indent=2))
@@ -246,13 +268,10 @@ def show_image_export(accession_id: str, image_uuid: str):
 def export_all_images(output_filename: Path = Path("bia-images-export.json")):
 
     accession_ids = [
-        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
-        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
-        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
-        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
-        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
-        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008",
-        "S-BIAD531", "S-BIAD599", "S-BIAD463", "S-BIAD634", "S-BIAD686", "S-BIAD493"
+    "S-BIAD493", "S-BIAD599", "S-BIAD686", "S-BIAD800",
+    "S-BIAD815", 
+    #"S-BIAD847",  This is a HCS study and URI causes crash
+    "S-BIAD952", "S-BIAD1082", "S-BIAD1090",
     ]
 
     study_accession_ids_to_export = accession_ids
@@ -278,13 +297,19 @@ def export_all_images(output_filename: Path = Path("bia-images-export.json")):
 def export_defaults(output_filename: Path = Path("bia-export.json")):
 
     accession_ids = [
-        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
-        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
-        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
-        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
-        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
-        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008"
+    "S-BIAD493", "S-BIAD599", "S-BIAD686", "S-BIAD800",
+    "S-BIAD815", 
+    #"S-BIAD847", HCS uri causing issues with extracting img info from zarr
+    "S-BIAD952", "S-BIAD1082", "S-BIAD1090",
     ]
+#    accession_ids = [
+#        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
+#        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
+#        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
+#        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
+#        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
+#        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008"
+#    ]
 
     study_accession_ids_to_export = accession_ids
 
