@@ -1,8 +1,15 @@
 from pathlib import Path
 from typing import Dict
+import logging
 
 import rich
 import typer
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+logger = logging.getLogger()
 
 from .scli import rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, get_image_by_accession_id_and_relpath
 from .config import settings
@@ -82,7 +89,7 @@ def transform_ai_study_dict(bia_study):
 
     return base_dict
 
-def bia_image_to_export_image(image, study, use_cache=False):
+def bia_image_to_export_image(image, study, use_cache=True):
 
     output_dirpath = settings.cache_root_dirpath / "images"
     output_dirpath.mkdir(exist_ok=True, parents=True)
@@ -201,7 +208,7 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
     with open(output_fpath, "w") as fh:
         fh.write(ExportDataset(**transform_dict).json(indent=2))
-        print(f"Saved to {output_fpath}")
+        logger.info(f"Saved to {output_fpath}")
 
     return ExportDataset(**transform_dict)
 
@@ -268,10 +275,13 @@ def show_image_export(accession_id: str, image_uuid: str):
 def export_all_images(output_filename: Path = Path("bia-images-export.json")):
 
     accession_ids = [
-    "S-BIAD493", "S-BIAD599", "S-BIAD686", "S-BIAD800",
-    "S-BIAD815", 
-    #"S-BIAD847",  This is a HCS study and URI causes crash
-    "S-BIAD952", "S-BIAD1082", "S-BIAD1090",
+        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
+        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
+        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
+        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
+        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
+        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008",
+        "S-BIAD531", "S-BIAD599", "S-BIAD463", "S-BIAD634", "S-BIAD686", "S-BIAD493"
     ]
 
     study_accession_ids_to_export = accession_ids
@@ -297,19 +307,13 @@ def export_all_images(output_filename: Path = Path("bia-images-export.json")):
 def export_defaults(output_filename: Path = Path("bia-export.json")):
 
     accession_ids = [
-    "S-BIAD493", "S-BIAD599", "S-BIAD686", "S-BIAD800",
-    "S-BIAD815", 
-    #"S-BIAD847", HCS uri causing issues with extracting img info from zarr
-    "S-BIAD952", "S-BIAD1082", "S-BIAD1090",
+        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
+        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
+        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
+        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
+        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
+        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008"
     ]
-#    accession_ids = [
-#        "S-BSST223", "S-BSST429", "S-BIAD144", "S-BIAD217", "S-BIAD368", "S-BIAD425",
-#        "S-BIAD582", "S-BIAD606", "S-BIAD608", "S-BIAD620",
-#        "S-BIAD661", "S-BIAD626", "S-BIAD627", "S-BIAD725", "S-BIAD746", "S-BIAD826",
-#        "S-BIAD886", "S-BIAD901", "S-BIAD915", "S-BIAD916", "S-BIAD922", "S-BIAD928",
-#        "S-BIAD952", "S-BIAD954", "S-BIAD961", "S-BIAD963", "S-BIAD968", "S-BIAD976",
-#        "S-BIAD978", "S-BIAD987", "S-BIAD988", "S-BIAD993", "S-BIAD999", "S-BIAD1008"
-#    ]
 
     study_accession_ids_to_export = accession_ids
 
