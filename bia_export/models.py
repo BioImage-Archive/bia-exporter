@@ -92,7 +92,30 @@ class ExportAIDataset(BaseModel):
     n_images: int
     image_uuids: List[str]
     links: List[Link] = []
+    annfile_uuids: List[str]
+    corresponding_ann_uuids: Dict[str, str| None] = {}
+    corresponding_im_uuids: Dict[str, str | None] = {}
 
+class ExportSODataset(BaseModel):
+    accession_id: str
+    title: str
+    release_date: str
+    example_image_uri: str
+    imaging_type: str
+    organism: str
+    scseq_desc: Optional[str] = None
+    scseq_link: Optional[str]
+    code_desc: Optional[str] 
+    code_link: Optional[str] 
+    n_images: int
+    annotation_type: Optional[str] = None
+    annotation_method: Optional[str] = None
+    example_annotation_uri: Optional[str] = None
+    models_description: Optional[str] = None
+    models_uri: Optional[str] = None
+    image_uuids: List[str]
+    links: List[Link] = []
+    
 class Exports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
@@ -102,3 +125,9 @@ class AIExports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
     datasets: Dict[str, ExportAIDataset]
+
+class SOExports(BaseModel):
+    collections: Dict[str, ExportCollection] = {}
+    images: Dict[str, ExportImage]
+    datasets: Dict[str, ExportSODataset]
+

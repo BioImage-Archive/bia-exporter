@@ -23,7 +23,7 @@ def get_study_uuid_by_accession_id(accession_id: str):
     return study_uuid
 
 
-def get_images_with_a_rep_type(study_uuid, rep_type, limit=5):
+def get_images_with_a_rep_type(study_uuid, rep_type, limit=8):
 
     images = rw_client.search_images_exact_match(
         api_models.SearchImageFilter(
@@ -54,3 +54,16 @@ def get_image_by_accession_id_and_relpath(accession_id: str, relpath: str):
 
     if len(images):
         return images[0]
+    
+def get_file_references_by_study_uuid(study_uuid: str):
+    file_references = rw_client.get_study_file_references(study_uuid, limit=20, apply_annotations=True)
+    return file_references
+
+def get_annotation_file_uuids_by_study_uuid(study_uuid: str):
+    file_refs = rw_client.get_study_file_references(study_uuid, limit=20, apply_annotations=True) 
+    
+    return [
+        fileref.uuid for fileref in file_refs
+        if "source image" in fileref.attributes.keys()
+    ]
+
