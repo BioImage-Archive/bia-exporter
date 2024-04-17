@@ -39,6 +39,25 @@ class ExportImage(BaseModel):
     PhysicalSizeY: Optional[float] = None
     PhysicalSizeZ: Optional[float] = None
 
+    biosample_title: Optional[str] = None
+    biosample_organism_scientific_name: Optional[str] = None
+    biosample_organism_common_name: Optional[str] = None
+    biosample_organism_ncbi_taxon: Optional[str] = None
+    biosample_description: Optional[str] = None
+    biosample_biological_entity: Optional[str] = None
+    biosample_experimental_variables: Optional[str] = None
+    biosample_extrinsic_variables: Optional[str] = None
+    biosample_intrinsic_variables: Optional[str] = None
+
+    specimen_title:  Optional[str] = None
+    specimen_sample_preparation_protocol:  Optional[str] = None
+    specimen_growth_protocol:  Optional[str] = None
+
+    image_acquisition_title: Optional[str] = None
+    image_acquisition_imaging_instrument: Optional[str] = None
+    image_acquisition_image_acquisition_parameters: Optional[str] = None
+    image_acquisition_imaging_method: Optional[str] = None
+
     attributes: Dict[str, str | None]
 
 
@@ -111,3 +130,4 @@ class SOExports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
     datasets: Dict[str, ExportSODataset]
+

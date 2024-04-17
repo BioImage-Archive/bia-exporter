@@ -1,8 +1,15 @@
 from pathlib import Path
 from typing import Dict
+import logging
 
 import rich
 import typer
+from rich.logging import RichHandler
+
+logging.basicConfig(
+    level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+logger = logging.getLogger()
 
 from .scli import (rw_client, get_study_uuid_by_accession_id, get_images_with_a_rep_type, 
                    get_file_references_by_study_uuid,
@@ -169,8 +176,45 @@ def bia_image_to_export_image(image, study, use_cache=True):
         source_image_uuid=source_image_uuid,
         source_image_thumbnail_uri=source_image_thumbnail_uri,
         overlay_image_uri=overlay_image_uri,
+
         attributes=filter_image_attributes(image)
     )
+
+
+
+
+    # TODO: Refactor so titles and child uuids obtained in same API call - use for loop
+    # Get BioSample, Specimen and ImageAcquisition
+    specimen_uuids = []
+    specimen_uuids.extend([rw_client.get_image_acquisition(image_acquisition_method_uuid).specimen_uuid for image_acquisition_method_uuid in image.image_acquisition_methods_uuid])
+
+    biosample_uuids = []
+    biosample_uuids.extend([rw_client.get_specimen(specimen_uuid).biosample_uuid for specimen_uuid in specimen_uuids])
+    
+    if len(image.image_acquisition_methods_uuid) > 0:
+        image_acquisition = rw_client.get_image_acquisition(image.image_acquisition_methods_uuid[0])
+        export_im.image_acquisition_title = image_acquisition.title
+        export_im.image_acquisition_imaging_instrument = image_acquisition.imaging_instrument
+        export_im.image_acquisition_image_acquisition_parameters = image_acquisition.image_acquisition_parameters
+        export_im.image_acquisition_imaging_method = image_acquisition.imaging_method
+    
+    if len(specimen_uuids) > 0:
+        specimen = rw_client.get_specimen(specimen_uuids[0])
+        export_im.specimen_title = specimen.title
+        export_im.specimen_sample_preparation_protocol = specimen.sample_preparation_protocol
+        export_im.specimen_growth_protocol = specimen.growth_protocol
+
+    if len(biosample_uuids) > 0:
+        biosample = rw_client.get_biosample(biosample_uuids[0]).__dict__
+        export_im.biosample_title = biosample["title"]
+        export_im.biosample_organism_scientific_name = biosample["organism_scientific_name"]
+        export_im.biosample_organism_common_name = biosample["organism_common_name"]
+        export_im.biosample_organism_ncbi_taxon = biosample["organism_ncbi_taxon"]
+        export_im.biosample_description = biosample["description"]
+        export_im.biosample_biological_entity = biosample["biological_entity"]
+        export_im.biosample_experimental_variables = ", ".join(biosample["experimental_variables"])
+        export_im.biosample_extrinsic_variables = ", ".join(biosample["extrinsic_variables"])
+        export_im.biosample_intrinsic_variables = ", ".join(biosample["intrinsic_variables"])
 
     with open(output_fpath, "w") as fh:
         fh.write(export_im.json(indent=2))
@@ -260,6 +304,7 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
     with open(output_fpath, "w") as fh:
         fh.write(ExportDataset(**transform_dict).json(indent=2))
+        logger.info(f"Saved to {output_fpath}")
 
     return ExportDataset(**transform_dict)
 

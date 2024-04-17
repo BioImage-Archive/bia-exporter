@@ -1,8 +1,16 @@
 BIA Export
 ==========
 
-Export data from the BIA to feed static pages, and other downstream consumers.
+Export data from the BIA to feed static pages, and other downstream consumers. This:
 
+* Pulls data from the BIA Integrator API
+* Selects attributes for images and studies
+* Derives information from OME-Zarr representations (physical dimensions, axis sizes)
+* Transforms to a specific export format
+* Writes the result to a JSON file
+
+Note that the export process caches results, so be careful!
+ 
 Installation
 ------------
 
