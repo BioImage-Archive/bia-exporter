@@ -269,8 +269,8 @@ def study_uuid_to_export_sodataset(study_uuid) -> ExportSODataset:
     output_dirpath = settings.cache_root_dirpath / "datasets"
     output_dirpath.mkdir(exist_ok=True, parents=True)
     output_fpath = output_dirpath / f"{study_uuid}.json"
-    if output_fpath.exists():
-        return ExportSODataset.parse_file(output_fpath)
+    #if output_fpath.exists():
+    #    return ExportSODataset.parse_file(output_fpath)
 
     bia_study = rw_client.get_study(study_uuid, apply_annotations=True)
 
@@ -296,8 +296,8 @@ def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
     output_dirpath = settings.cache_root_dirpath / "datasets"
     output_dirpath.mkdir(exist_ok=True, parents=True)
     output_fpath = output_dirpath / f"{study_uuid}.json"
-    if output_fpath.exists():
-        return ExportDataset.parse_file(output_fpath)
+    #if output_fpath.exists():
+    #    return ExportDataset.parse_file(output_fpath)
 
     bia_study = rw_client.get_study(study_uuid, apply_annotations=True)
 
@@ -317,7 +317,6 @@ def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
     annotation_files = get_annotation_files_by_study_uuid(study_uuid)
     
     ann_uuids_by_sourcename = get_ann_uuid_by_sourcename(annotation_files)
-    #rich.print(ann_uuids_by_sourcename)
 
     transform_dict["corresponding_ann_uuids"] = {
         image.uuid: ann_uuids_by_sourcename.get(image.name)
@@ -333,6 +332,8 @@ def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
         for annfile in annotation_files.values()
     }
     
+    rich.print(transform_dict)
+
     with open(output_fpath, "w") as fh:
         fh.write(ExportAIDataset(**transform_dict).json(indent=2))
 
@@ -478,7 +479,9 @@ def export_defaults(output_filename: Path = Path("bia-export.json")):
 def ai_datasets(output_filename: Path = Path("bia-ai-export.json")):
 
     accession_ids = [
-        "S-BIAD531", "S-BIAD599", "S-BIAD463", "S-BIAD634", "S-BIAD686", "S-BIAD493"]
+        "S-BIAD531"
+    ]
+    #, "S-BIAD599", "S-BIAD463", "S-BIAD634", "S-BIAD686", "S-BIAD493"]
 
     study_accession_ids_to_export = accession_ids
 
@@ -550,7 +553,7 @@ def annotation_files(output_filename: Path = Path("bia-annotation_files.json")):
         accession_id: get_study_uuid_by_accession_id(accession_id)
         for accession_id in study_accession_ids_to_export
     }
-    
+
     export_annotfiles = {}
     for study_uuid in study_uuids_by_accession_id.values():
         study_filerefs = get_file_references_by_study_uuid(study_uuid)

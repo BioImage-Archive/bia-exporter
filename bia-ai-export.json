@@ -1257,7 +1257,8 @@
         "00e62b09-1229-49b5-9002-361514249eb7",
         "014a0e8b-fbb2-494a-a6c9-5e2a195d0901",
         "016503b7-74aa-420b-959c-8720a0b5dbac",
-        "01d4aecf-5a96-4e2e-b6ff-30809b0bd70a"
+        "01d4aecf-5a96-4e2e-b6ff-30809b0bd70a",
+        "01dc6c0f-1ac0-49c2-8f68-33e56e992462"
       ],
       "links": [
         {
@@ -1265,7 +1266,53 @@
           "type": "original_submission",
           "url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD531"
         }
-      ]
+      ],
+      "annfile_uuids": [
+        "000f9257-938d-4bd5-a12e-50aca7f1730a",
+        "0010dd88-7d4f-44f4-bc7f-64e32def236f",
+        "00b991cf-c9df-413b-9df4-5893ac887e21",
+        "01081bd5-12d4-44a5-b6f8-2c2920ff5fc8",
+        "01205586-4ae0-46cb-a900-fa014c285bec",
+        "0160d11d-d657-4b15-b803-dee295477f82",
+        "01872834-2f2c-431e-bb56-7f6313154c83",
+        "01b3c145-e2ed-4713-8a48-afc5546d7b38",
+        "01ed41e5-a865-4a93-baaa-0859ec8c5093",
+        "01ee2ce1-7943-4ef5-9472-ce5b906310a2",
+        "02aa675c-8eb9-4f9a-b25f-e8c72f08e62c",
+        "02c0e87a-3130-4e8c-9a2b-f940c8b35408",
+        "0322c02f-0beb-4869-9dc1-6a3fa039c643",
+        "0327dc74-7b87-4141-8340-b62e5dac4594",
+        "0331d9c2-9aa8-4725-80a4-74b19ab38d4b",
+        "03439602-4ad9-4ad4-95c6-eff2d5bf07e2",
+        "035cb41a-5965-4052-bbac-d70681e87ba2"
+      ],
+      "corresponding_ann_uuids": {
+        "0075e0e3-cc35-4c81-aeb8-8fe31eb84f6d": null,
+        "00e62b09-1229-49b5-9002-361514249eb7": null,
+        "014a0e8b-fbb2-494a-a6c9-5e2a195d0901": null,
+        "016503b7-74aa-420b-959c-8720a0b5dbac": null,
+        "01d4aecf-5a96-4e2e-b6ff-30809b0bd70a": null,
+        "01dc6c0f-1ac0-49c2-8f68-33e56e992462": null
+      },
+      "corresponding_im_uuids": {
+        "000f9257-938d-4bd5-a12e-50aca7f1730a": null,
+        "0010dd88-7d4f-44f4-bc7f-64e32def236f": null,
+        "00b991cf-c9df-413b-9df4-5893ac887e21": null,
+        "01081bd5-12d4-44a5-b6f8-2c2920ff5fc8": null,
+        "01205586-4ae0-46cb-a900-fa014c285bec": null,
+        "0160d11d-d657-4b15-b803-dee295477f82": null,
+        "01872834-2f2c-431e-bb56-7f6313154c83": null,
+        "01b3c145-e2ed-4713-8a48-afc5546d7b38": null,
+        "01ed41e5-a865-4a93-baaa-0859ec8c5093": null,
+        "01ee2ce1-7943-4ef5-9472-ce5b906310a2": null,
+        "02aa675c-8eb9-4f9a-b25f-e8c72f08e62c": null,
+        "02c0e87a-3130-4e8c-9a2b-f940c8b35408": null,
+        "0322c02f-0beb-4869-9dc1-6a3fa039c643": null,
+        "0327dc74-7b87-4141-8340-b62e5dac4594": null,
+        "0331d9c2-9aa8-4725-80a4-74b19ab38d4b": null,
+        "03439602-4ad9-4ad4-95c6-eff2d5bf07e2": null,
+        "035cb41a-5965-4052-bbac-d70681e87ba2": null
+      }
     },
     "S-BIAD599": {
       "accession_id": "S-BIAD599",
@@ -1285,7 +1332,8 @@
         "01d3f195-c42f-4c47-8b0a-6b5d28f1e822",
         "01d6dab7-6bcc-4775-8917-7c85b3ad3bad",
         "01fca2a0-adaa-496d-b20d-5b011b05b38d",
-        "02a8da8e-ac2c-4aa6-93d9-e46fdac0fd7f"
+        "02a8da8e-ac2c-4aa6-93d9-e46fdac0fd7f",
+        "02cc8a5b-7aff-4d36-852c-9d15cb8446b9"
       ],
       "links": [
         {
@@ -1293,7 +1341,29 @@
           "type": "original_submission",
           "url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD599"
         }
-      ]
+      ],
+      "annfile_uuids": [
+        "0015775e-169e-4fcf-a85b-4e39fe2fb139",
+        "0204e98e-b977-4d05-81c8-0ca38f0aa6f7",
+        "037f98a8-ba56-4856-b3c7-8a388e10862c",
+        "04cabd1d-bf70-4cf4-8d2f-0e070dc50625",
+        "05a72723-cd68-4090-be33-92c241bccf0b"
+      ],
+      "corresponding_ann_uuids": {
+        "01776a3a-16a5-4c48-a104-fefcc83cc2ee": null,
+        "01d3f195-c42f-4c47-8b0a-6b5d28f1e822": null,
+        "01d6dab7-6bcc-4775-8917-7c85b3ad3bad": null,
+        "01fca2a0-adaa-496d-b20d-5b011b05b38d": null,
+        "02a8da8e-ac2c-4aa6-93d9-e46fdac0fd7f": null,
+        "02cc8a5b-7aff-4d36-852c-9d15cb8446b9": null
+      },
+      "corresponding_im_uuids": {
+        "0015775e-169e-4fcf-a85b-4e39fe2fb139": null,
+        "0204e98e-b977-4d05-81c8-0ca38f0aa6f7": null,
+        "037f98a8-ba56-4856-b3c7-8a388e10862c": null,
+        "04cabd1d-bf70-4cf4-8d2f-0e070dc50625": null,
+        "05a72723-cd68-4090-be33-92c241bccf0b": null
+      }
     },
     "S-BIAD463": {
       "accession_id": "S-BIAD463",
@@ -1313,7 +1383,8 @@
         "002635f4-810e-40e1-a655-c13e8c7b9aef",
         "00635cc4-1f62-40f1-a4a0-d460dabae82b",
         "00cddbf9-1282-4a49-94d9-481b7a43cc0c",
-        "00ea59a2-9e89-4acf-b8c7-6308b776a059"
+        "00ea59a2-9e89-4acf-b8c7-6308b776a059",
+        "00fc7fb3-b58d-43bc-b844-b906b3cbcf6c"
       ],
       "links": [
         {
@@ -1321,7 +1392,45 @@
           "type": "original_submission",
           "url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD463"
         }
-      ]
+      ],
+      "annfile_uuids": [
+        "0071f42d-ddba-4c34-81a8-e9d15074a155",
+        "01627c39-e462-465d-bdb3-30ea3770c9e1",
+        "019b97f9-779c-4589-bbbf-f73e782160c6",
+        "01c6710e-dd42-4356-95bb-fd3e6a26d95c",
+        "01ea224c-869d-48b0-aec2-ee0bb04fc0d8",
+        "02590b71-8e1d-48f0-820d-b6aec2d1960b",
+        "02984b01-e285-4437-98aa-16b85aaa64fe",
+        "02bd6701-2ad7-48d2-8c2f-7952b5eaf4fa",
+        "03501f0b-4ff0-4308-8f7d-3f9a844b2d68",
+        "03942f58-d7f4-460d-bad5-cb00c046413e",
+        "03a5d08c-9ffd-46d4-b381-cd403d7f095c",
+        "044a703a-dc6e-41a5-824c-722d4e0290a0",
+        "046ad80a-95a6-4ec6-8de4-098b5c104e58"
+      ],
+      "corresponding_ann_uuids": {
+        "0000e66c-ebe0-4f27-92bd-95fdd487948b": null,
+        "002635f4-810e-40e1-a655-c13e8c7b9aef": null,
+        "00635cc4-1f62-40f1-a4a0-d460dabae82b": null,
+        "00cddbf9-1282-4a49-94d9-481b7a43cc0c": null,
+        "00ea59a2-9e89-4acf-b8c7-6308b776a059": null,
+        "00fc7fb3-b58d-43bc-b844-b906b3cbcf6c": null
+      },
+      "corresponding_im_uuids": {
+        "0071f42d-ddba-4c34-81a8-e9d15074a155": null,
+        "01627c39-e462-465d-bdb3-30ea3770c9e1": null,
+        "019b97f9-779c-4589-bbbf-f73e782160c6": null,
+        "01c6710e-dd42-4356-95bb-fd3e6a26d95c": null,
+        "01ea224c-869d-48b0-aec2-ee0bb04fc0d8": null,
+        "02590b71-8e1d-48f0-820d-b6aec2d1960b": null,
+        "02984b01-e285-4437-98aa-16b85aaa64fe": null,
+        "02bd6701-2ad7-48d2-8c2f-7952b5eaf4fa": null,
+        "03501f0b-4ff0-4308-8f7d-3f9a844b2d68": null,
+        "03942f58-d7f4-460d-bad5-cb00c046413e": null,
+        "03a5d08c-9ffd-46d4-b381-cd403d7f095c": null,
+        "044a703a-dc6e-41a5-824c-722d4e0290a0": null,
+        "046ad80a-95a6-4ec6-8de4-098b5c104e58": null
+      }
     },
     "S-BIAD634": {
       "accession_id": "S-BIAD634",
@@ -1341,7 +1450,10 @@
         "019da5bd-f6b3-445a-b9c7-0f0363133e34",
         "019e203f-c4cd-4b0b-8b8b-8e6ae2552bf3",
         "052cbc1f-d29d-444d-93de-281249360c8e",
-        "05b4fe66-2f00-4fcb-a558-292f986f0397"
+        "05b4fe66-2f00-4fcb-a558-292f986f0397",
+        "05e66f0c-d0a5-4198-b0ae-09f4b738d2fa",
+        "15e5f46d-369b-49cf-9fda-15c0d0ed67ab",
+        "906e2ace-8e99-4841-89e6-f95983632896"
       ],
       "links": [
         {
@@ -1349,7 +1461,51 @@
           "type": "original_submission",
           "url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD634"
         }
-      ]
+      ],
+      "annfile_uuids": [
+        "008008b3-3c3a-4511-8211-701a562d2b0c",
+        "026f69cc-f56f-4c9b-9d18-4938be9760a5",
+        "029cb4f8-91f0-42fe-8ffe-42faef888b57",
+        "02d34b78-eb04-4851-86b5-c3fffbf5825f",
+        "02ff47d0-669a-49a8-91a1-f1c0c9be1fad",
+        "04c3217d-f385-4714-80fb-5b2ffe7608bb",
+        "05e8a83a-d17b-403d-bbcc-47e3afae6537",
+        "063147b8-83ed-4012-a66c-ec0d099365d8",
+        "07f27e09-41e2-4986-a5fc-91b4b8f5c56a",
+        "08d6780c-e79d-454a-a3b7-9a0da2e5e4db",
+        "09503b03-0df7-412c-86b2-992595c7598c",
+        "097fbfb8-0b82-48fa-942b-957c76db3753",
+        "09eef666-7967-459e-afd0-0486894bc536",
+        "0b2a245d-a8a9-4a22-88f0-087293ff67a9",
+        "0b35fddc-e61d-49ef-ab31-b20711c7cd2b"
+      ],
+      "corresponding_ann_uuids": {
+        "00fefce9-850f-43eb-b165-e4fa3aef8e94": null,
+        "019da5bd-f6b3-445a-b9c7-0f0363133e34": null,
+        "019e203f-c4cd-4b0b-8b8b-8e6ae2552bf3": null,
+        "052cbc1f-d29d-444d-93de-281249360c8e": null,
+        "05b4fe66-2f00-4fcb-a558-292f986f0397": null,
+        "05e66f0c-d0a5-4198-b0ae-09f4b738d2fa": null,
+        "15e5f46d-369b-49cf-9fda-15c0d0ed67ab": null,
+        "906e2ace-8e99-4841-89e6-f95983632896": null
+      },
+      "corresponding_im_uuids": {
+        "008008b3-3c3a-4511-8211-701a562d2b0c": null,
+        "026f69cc-f56f-4c9b-9d18-4938be9760a5": null,
+        "029cb4f8-91f0-42fe-8ffe-42faef888b57": null,
+        "02d34b78-eb04-4851-86b5-c3fffbf5825f": null,
+        "02ff47d0-669a-49a8-91a1-f1c0c9be1fad": null,
+        "04c3217d-f385-4714-80fb-5b2ffe7608bb": null,
+        "05e8a83a-d17b-403d-bbcc-47e3afae6537": null,
+        "063147b8-83ed-4012-a66c-ec0d099365d8": null,
+        "07f27e09-41e2-4986-a5fc-91b4b8f5c56a": null,
+        "08d6780c-e79d-454a-a3b7-9a0da2e5e4db": null,
+        "09503b03-0df7-412c-86b2-992595c7598c": null,
+        "097fbfb8-0b82-48fa-942b-957c76db3753": null,
+        "09eef666-7967-459e-afd0-0486894bc536": null,
+        "0b2a245d-a8a9-4a22-88f0-087293ff67a9": null,
+        "0b35fddc-e61d-49ef-ab31-b20711c7cd2b": null
+      }
     },
     "S-BIAD686": {
       "accession_id": "S-BIAD686",
@@ -1369,7 +1525,10 @@
         "00b1f816-53bd-42d6-bfa7-ff2212e92640",
         "01550e0d-70c7-4b5e-ae80-7acc82e96364",
         "016c9f1c-4f21-498b-98a4-809f59d88414",
-        "0185258c-4720-484e-98ea-bf5ce34e1c12"
+        "0185258c-4720-484e-98ea-bf5ce34e1c12",
+        "0185e8eb-fa99-43d9-8e5b-24c80234e4c3",
+        "079d6da3-7854-49cf-865c-de5cff30f543",
+        "25e83e8b-54da-40a5-8bb2-5bee840ef157"
       ],
       "links": [
         {
@@ -1377,7 +1536,49 @@
           "type": "original_submission",
           "url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD686"
         }
-      ]
+      ],
+      "annfile_uuids": [
+        "015aeb83-99ec-416c-98bb-b4def59456a0",
+        "016c4879-e9e5-4c8e-a5a2-a2232f45433d",
+        "018aeed5-e8c5-4123-adeb-53f13bb8e08e",
+        "0207b14a-c479-44d6-943b-7171f2be3913",
+        "027c5c48-d92e-40a2-b0ec-7a75a39e78dd",
+        "02bb8110-7e1e-440a-a2a2-134e01b317c1",
+        "03872f1f-6e35-489e-8c11-77511c3fb66c",
+        "03c59284-d1fd-4f92-b5a0-55792ae3da99",
+        "03f3cde9-ab63-407d-acb6-891248136d70",
+        "040b39e3-59b5-495a-a861-3fde79fac5a6",
+        "045e9848-1dcb-4789-b14b-2bf9d073ae7e",
+        "04bb36a2-9539-4f7a-b68d-7b7c0c314880",
+        "04e093fd-cc50-444a-b5ab-bc8262bb9876",
+        "04effd18-6ab0-4567-b1b4-750f1ebf5d4a"
+      ],
+      "corresponding_ann_uuids": {
+        "00810341-96e8-4022-8d6b-21738d9e9fa7": null,
+        "00b1f816-53bd-42d6-bfa7-ff2212e92640": null,
+        "01550e0d-70c7-4b5e-ae80-7acc82e96364": null,
+        "016c9f1c-4f21-498b-98a4-809f59d88414": null,
+        "0185258c-4720-484e-98ea-bf5ce34e1c12": null,
+        "0185e8eb-fa99-43d9-8e5b-24c80234e4c3": null,
+        "079d6da3-7854-49cf-865c-de5cff30f543": null,
+        "25e83e8b-54da-40a5-8bb2-5bee840ef157": "03f3cde9-ab63-407d-acb6-891248136d70"
+      },
+      "corresponding_im_uuids": {
+        "015aeb83-99ec-416c-98bb-b4def59456a0": null,
+        "016c4879-e9e5-4c8e-a5a2-a2232f45433d": null,
+        "018aeed5-e8c5-4123-adeb-53f13bb8e08e": null,
+        "0207b14a-c479-44d6-943b-7171f2be3913": null,
+        "027c5c48-d92e-40a2-b0ec-7a75a39e78dd": null,
+        "02bb8110-7e1e-440a-a2a2-134e01b317c1": null,
+        "03872f1f-6e35-489e-8c11-77511c3fb66c": null,
+        "03c59284-d1fd-4f92-b5a0-55792ae3da99": null,
+        "03f3cde9-ab63-407d-acb6-891248136d70": "25e83e8b-54da-40a5-8bb2-5bee840ef157",
+        "040b39e3-59b5-495a-a861-3fde79fac5a6": null,
+        "045e9848-1dcb-4789-b14b-2bf9d073ae7e": null,
+        "04bb36a2-9539-4f7a-b68d-7b7c0c314880": null,
+        "04e093fd-cc50-444a-b5ab-bc8262bb9876": null,
+        "04effd18-6ab0-4567-b1b4-750f1ebf5d4a": null
+      }
     },
     "S-BIAD493": {
       "accession_id": "S-BIAD493",
@@ -1397,7 +1598,10 @@
         "1f84458a-9965-41c3-9bfc-660f8f7ae984",
         "25376514-21f8-4d8d-b75f-5342b83ae960",
         "2f6c3823-bd2c-4d60-b0ac-3fa2a25f7ebe",
-        "30b5568b-016d-4cf8-8454-96f6ff2a676a"
+        "30b5568b-016d-4cf8-8454-96f6ff2a676a",
+        "49151eaf-36b0-439f-bd0b-4d53177f70a9",
+        "6c469a45-1ae5-4945-a645-3f181b720681",
+        "8bf6d9a0-a38f-43f8-bd03-5532a43f352c"
       ],
       "links": [
         {
@@ -1405,7 +1609,27 @@
           "type": "original_submission",
           "url": "https://www.ebi.ac.uk/biostudies/BioImages/studies/S-BIAD493"
         }
-      ]
+      ],
+      "annfile_uuids": [
+        "4f01cb57-b642-466d-b4dd-46c9517cd84e",
+        "8151257e-15d8-4c82-a2ae-41ab132a2948",
+        "e27d9778-5b25-4467-aa14-c23c3baafff9"
+      ],
+      "corresponding_ann_uuids": {
+        "0ef10250-a8d8-4d25-a005-56576eed933c": null,
+        "1f84458a-9965-41c3-9bfc-660f8f7ae984": "8151257e-15d8-4c82-a2ae-41ab132a2948",
+        "25376514-21f8-4d8d-b75f-5342b83ae960": null,
+        "2f6c3823-bd2c-4d60-b0ac-3fa2a25f7ebe": null,
+        "30b5568b-016d-4cf8-8454-96f6ff2a676a": null,
+        "49151eaf-36b0-439f-bd0b-4d53177f70a9": null,
+        "6c469a45-1ae5-4945-a645-3f181b720681": null,
+        "8bf6d9a0-a38f-43f8-bd03-5532a43f352c": "e27d9778-5b25-4467-aa14-c23c3baafff9"
+      },
+      "corresponding_im_uuids": {
+        "4f01cb57-b642-466d-b4dd-46c9517cd84e": null,
+        "8151257e-15d8-4c82-a2ae-41ab132a2948": "1f84458a-9965-41c3-9bfc-660f8f7ae984",
+        "e27d9778-5b25-4467-aa14-c23c3baafff9": "8bf6d9a0-a38f-43f8-bd03-5532a43f352c"
+      }
     }
   }
 }
