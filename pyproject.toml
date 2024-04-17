@@ -24,6 +24,7 @@ ruamel-yaml = "^0.18.5"
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.22.2"
+pytest = "^7.4.3"
 
 [build-system]
 requires = ["poetry-core"]
