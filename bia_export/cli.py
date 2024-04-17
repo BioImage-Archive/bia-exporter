@@ -145,7 +145,7 @@ def bia_image_to_export_image(image, study, use_cache=True):
 
 
 
-    # Refactor so titles and child uuids obtained in same API call - for loop
+    # TODO: Refactor so titles and child uuids obtained in same API call - use for loop
     # Get BioSample, Specimen and ImageAcquisition
     specimen_uuids = []
     specimen_uuids.extend([rw_client.get_image_acquisition(image_acquisition_method_uuid).specimen_uuid for image_acquisition_method_uuid in image.image_acquisition_methods_uuid])
