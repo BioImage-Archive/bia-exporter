@@ -49,9 +49,9 @@ class ExportImage(BaseModel):
     biosample_extrinsic_variables: Optional[str] = None
     biosample_intrinsic_variables: Optional[str] = None
 
-    specimen_title:  Optional[str] = None
-    specimen_sample_preparation_protocol:  Optional[str] = None
-    specimen_growth_protocol:  Optional[str] = None
+    specimen_title: Optional[str] = None
+    specimen_sample_preparation_protocol: Optional[str] = None
+    specimen_growth_protocol: Optional[str] = None
 
     image_acquisition_title: Optional[str] = None
     image_acquisition_imaging_instrument: Optional[str] = None
@@ -66,6 +66,7 @@ class Link(BaseModel):
     type: str
     url: str
 
+
 class ExportDataset(BaseModel):
     accession_id: str
     title: str
@@ -76,6 +77,7 @@ class ExportDataset(BaseModel):
     n_images: int
     image_uuids: List[str]
     links: List[Link] = []
+
 
 class ExportAIDataset(BaseModel):
     accession_id: str
@@ -93,8 +95,9 @@ class ExportAIDataset(BaseModel):
     image_uuids: List[str]
     links: List[Link] = []
     annfile_uuids: List[str]
-    corresponding_ann_uuids: Dict[str, str| None] = {}
+    corresponding_ann_uuids: Dict[str, str | None] = {}
     corresponding_im_uuids: Dict[str, str | None] = {}
+
 
 class ExportSODataset(BaseModel):
     accession_id: str
@@ -105,8 +108,8 @@ class ExportSODataset(BaseModel):
     organism: str
     scseq_desc: Optional[str] = None
     scseq_link: Optional[str]
-    code_desc: Optional[str] 
-    code_link: Optional[str] 
+    code_desc: Optional[str]
+    code_link: Optional[str]
     n_images: int
     annotation_type: Optional[str] = None
     annotation_method: Optional[str] = None
@@ -115,19 +118,21 @@ class ExportSODataset(BaseModel):
     models_uri: Optional[str] = None
     image_uuids: List[str]
     links: List[Link] = []
-    
+
+
 class Exports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
     datasets: Dict[str, ExportDataset] = {}
+
 
 class AIExports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
     datasets: Dict[str, ExportAIDataset]
 
+
 class SOExports(BaseModel):
     collections: Dict[str, ExportCollection] = {}
     images: Dict[str, ExportImage]
     datasets: Dict[str, ExportSODataset]
-
