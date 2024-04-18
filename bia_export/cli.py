@@ -183,8 +183,8 @@ def bia_image_to_export_image(image, study, use_cache=True):
     specimen_uuids = []
     specimen_uuids.extend(
         [
-            rw_client.get_image_acquisition(image_acquisition_method_uuid).specimen_uuid
-            for image_acquisition_method_uuid in image.image_acquisition_methods_uuid
+            rw_client.get_image_acquisition(image_acquisition_uuid).specimen_uuid
+            for image_acquisition_uuid in image.image_acquisitions_uuid
         ]
     )
 
@@ -196,9 +196,9 @@ def bia_image_to_export_image(image, study, use_cache=True):
         ]
     )
 
-    if len(image.image_acquisition_methods_uuid) > 0:
+    if len(image.image_acquisitions_uuid) > 0:
         image_acquisition = rw_client.get_image_acquisition(
-            image.image_acquisition_methods_uuid[0]
+            image.image_acquisitions_uuid[0]
         )
         export_im.image_acquisition_title = image_acquisition.title
         export_im.image_acquisition_imaging_instrument = (
