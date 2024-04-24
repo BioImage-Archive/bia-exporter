@@ -166,22 +166,22 @@ def create_export_image(
         export_im.specimen_growth_protocol = specimens[0].growth_protocol
 
     if len(biosamples) > 0:
-        export_im.biosample_title = biosamples[0]["title"]
-        export_im.biosample_organism_scientific_name = biosamples[0][
-            "organism_scientific_name"
-        ]
-        export_im.biosample_organism_common_name = biosamples[0]["organism_common_name"]
-        export_im.biosample_organism_ncbi_taxon = biosamples[0]["organism_ncbi_taxon"]
-        export_im.biosample_description = biosamples[0]["description"]
-        export_im.biosample_biological_entity = biosamples[0]["biological_entity"]
+        export_im.biosample_title = biosamples[0].title
+        export_im.biosample_organism_scientific_name = biosamples[
+            0
+        ].organism_scientific_name
+        export_im.biosample_organism_common_name = biosamples[0].organism_common_name
+        export_im.biosample_organism_ncbi_taxon = biosamples[0].organism_ncbi_taxon
+        export_im.biosample_description = biosamples[0].description
+        export_im.biosample_biological_entity = biosamples[0].biological_entity
         export_im.biosample_experimental_variables = ", ".join(
-            biosamples[0]["experimental_variables"]
+            biosamples[0].experimental_variables
         )
         export_im.biosample_extrinsic_variables = ", ".join(
-            biosamples[0]["extrinsic_variables"]
+            biosamples[0].extrinsic_variables
         )
         export_im.biosample_intrinsic_variables = ", ".join(
-            biosamples[0]["intrinsic_variables"]
+            biosamples[0].intrinsic_variables
         )
 
     return export_im
