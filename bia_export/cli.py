@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict
 import logging
 
 import rich
@@ -8,20 +7,23 @@ from rich.logging import RichHandler
 
 from bia_integrator_api import models as api_models
 
-
-logging.basicConfig(
-    level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+from .data_mapping_utils import (
+    transform_ai_study_dict,
+    transform_so_study_dict,
+    transform_study_dict,
+    create_export_image,
+    get_ann_uuid_by_sourcename,
 )
-logger = logging.getLogger()
 
-from .scli import (
+from .bia_client_utils import (
     rw_client,
     get_study_uuid_by_accession_id,
     get_images_with_a_rep_type,
     get_file_references_by_study_uuid,
     get_annotation_file_uuids_by_study_uuid,
-    get_image_by_accession_id_and_relpath,
+    get_annotation_files_by_study_uuid,
 )
+
 from .config import settings
 from .models import (
     ExportDataset,
@@ -33,101 +35,19 @@ from .models import (
     ExportSODataset,
     SOExports,
 )
-from .proxyimage import ome_zarr_image_from_ome_zarr_uri
 
-ITK_BASE = "https://kitware.github.io/itk-vtk-viewer/app/?fileToLoad="
-VIZARR_BASE = "https://uk1s3.embassy.ebi.ac.uk/bia-zarr-test/vizarr/index.html?source="
 
+logging.basicConfig(
+    level="NOTSET", format="%(message)s", datefmt="[%X]", handlers=[RichHandler()]
+)
+logger = logging.getLogger()
 
 app = typer.Typer()
 
 
-def filter_image_attributes(image) -> Dict[str, str]:
-    """Given a BIA Image, filter the attributes for those we wish to export
-    and return as dict."""
-
-    def filter_func(key):
-        if key == "channels":
-            return False
-        if "channel" in key.lower():
-            return True
-
-        return False
-
-    return {key: value for key, value in image.attributes.items() if filter_func(key)}
-
-
-def transform_study_dict(bia_study):
-    keys = [
-        "accession_id",
-        "title",
-        "release_date",
-        "example_image_uri",
-        "imaging_type",
-        "organism",
-    ]
-    base_dict = {key: bia_study.__dict__[key] for key in keys}
-
-    base_dict["n_images"] = bia_study.images_count
-
-    return base_dict
-
-
-def transform_ai_study_dict(bia_study):
-    keys = [
-        "accession_id",
-        "title",
-        "release_date",
-        "example_image_uri",
-        "imaging_type",
-        "organism",
-    ]
-    base_dict = {key: bia_study.__dict__[key] for key in keys}
-
-    keys2 = [
-        "example_annotation_uri",
-        "annotation_type",
-        "annotation_method",
-        "models_description",
-        "models_uri",
-    ]
-    base_dict.update({key: bia_study.attributes.get(key) for key in keys2})
-
-    base_dict["n_images"] = bia_study.images_count
-
-    return base_dict
-
-
-def transform_so_study_dict(bia_study):
-    keys = [
-        "accession_id",
-        "title",
-        "release_date",
-        "example_image_uri",
-        "imaging_type",
-        "organism",
-    ]
-    base_dict = {key: bia_study.__dict__[key] for key in keys}
-
-    keys2 = [
-        # 'example_annotation_uri',
-        # 'annotation_type',
-        # 'annotation_method',
-        # 'models_description',
-        # 'models_uri',
-        "scseq_desc",
-        "scseq_link",
-        "code_desc",
-        "code_link",
-    ]
-    base_dict.update({key: bia_study.attributes.get(key) for key in keys2})
-
-    base_dict["n_images"] = bia_study.images_count
-
-    return base_dict
-
-
-def bia_image_to_export_image(image, study, use_cache=True):
+def bia_image_to_export_image(
+    image: api_models.BIAImage, study: api_models.BIAStudy, use_cache=True
+) -> ExportImage:
 
     output_dirpath = settings.cache_root_dirpath / "images"
     output_dirpath.mkdir(exist_ok=True, parents=True)
@@ -136,114 +56,36 @@ def bia_image_to_export_image(image, study, use_cache=True):
     if use_cache and output_fpath.exists():
         return ExportImage.parse_file(output_fpath)
 
-    reps_by_type = {rep.type: rep for rep in image.representations}
+    image_acquisitions = []
+    specimens = []
+    biosamples = []
 
-    ome_zarr_uri = reps_by_type["ome_ngff"].uri[0]
-    im = ome_zarr_image_from_ome_zarr_uri(ome_zarr_uri)
-
-    try:
-        thumbnail_uri = reps_by_type["thumbnail"].uri[0]
-    except KeyError:
-        thumbnail_uri = ""
-
-    # FIXME - should generalise this
-    source_image_uuid = image.attributes.get("source_image_uuid", None)
-    source_image_thumbnail_uri = image.attributes.get(
-        "source_image_thumbnail_uri", None
-    )
-    overlay_image_uri = image.attributes.get("overlay_image_uri", None)
-
-    export_im = ExportImage(
-        uuid=image.uuid,
-        name=Path(image.name).name,
-        alias="IM1",
-        original_relpath=image.original_relpath,
-        thumbnail_uri=thumbnail_uri,
-        study_accession_id=study.accession_id,
-        study_title=study.title,
-        release_date=study.release_date,
-        itk_uri=ITK_BASE + reps_by_type["ome_ngff"].uri[0],
-        vizarr_uri=VIZARR_BASE + reps_by_type["ome_ngff"].uri[0],
-        sizeX=im.sizeX,
-        sizeY=im.sizeY,
-        sizeZ=im.sizeZ,
-        sizeT=im.sizeT,
-        sizeC=im.sizeC,
-        PhysicalSizeX=im.PhysicalSizeX,
-        PhysicalSizeY=im.PhysicalSizeY,
-        PhysicalSizeZ=im.PhysicalSizeZ,
-        source_image_uuid=source_image_uuid,
-        source_image_thumbnail_uri=source_image_thumbnail_uri,
-        overlay_image_uri=overlay_image_uri,
-        attributes=filter_image_attributes(image),
-    )
-
-    # TODO: Refactor so titles and child uuids obtained in same API call - use for loop
-    # Get BioSample, Specimen and ImageAcquisition
-    specimen_uuids = []
-    specimen_uuids.extend(
+    # image->image_acquisition is 1->many, though usually only 1 acquisition per image
+    image_acquisitions.extend(
         [
-            rw_client.get_image_acquisition(image_acquisition_uuid).specimen_uuid
+            rw_client.get_image_acquisition(image_acquisition_uuid)
             for image_acquisition_uuid in image.image_acquisitions_uuid
         ]
     )
 
-    biosample_uuids = []
-    biosample_uuids.extend(
-        [
-            rw_client.get_specimen(specimen_uuid).biosample_uuid
-            for specimen_uuid in specimen_uuids
-        ]
+    # image->specimen should be 1->1, but have to assume 1->many because of 1->many image->image_acquisition link
+    for image_acquisition in image_acquisitions:
+        specimen.append(rw_client.get_specimen(image_acquisition.specimen_uuid))
+
+    for specimen in specimens:
+        biosamples.append(rw_client.get_biosample(specimen.biosample_uuid))
+
+    converted_image = create_export_image(
+        image, study, image_acquisitions, specimens, biosamples
     )
 
-    if len(image.image_acquisitions_uuid) > 0:
-        image_acquisition = rw_client.get_image_acquisition(
-            image.image_acquisitions_uuid[0]
-        )
-        export_im.image_acquisition_title = image_acquisition.title
-        export_im.image_acquisition_imaging_instrument = (
-            image_acquisition.imaging_instrument
-        )
-        export_im.image_acquisition_image_acquisition_parameters = (
-            image_acquisition.image_acquisition_parameters
-        )
-        export_im.image_acquisition_imaging_method = image_acquisition.imaging_method
-
-    if len(specimen_uuids) > 0:
-        specimen = rw_client.get_specimen(specimen_uuids[0])
-        export_im.specimen_title = specimen.title
-        export_im.specimen_sample_preparation_protocol = (
-            specimen.sample_preparation_protocol
-        )
-        export_im.specimen_growth_protocol = specimen.growth_protocol
-
-    if len(biosample_uuids) > 0:
-        biosample = rw_client.get_biosample(biosample_uuids[0]).__dict__
-        export_im.biosample_title = biosample["title"]
-        export_im.biosample_organism_scientific_name = biosample[
-            "organism_scientific_name"
-        ]
-        export_im.biosample_organism_common_name = biosample["organism_common_name"]
-        export_im.biosample_organism_ncbi_taxon = biosample["organism_ncbi_taxon"]
-        export_im.biosample_description = biosample["description"]
-        export_im.biosample_biological_entity = biosample["biological_entity"]
-        export_im.biosample_experimental_variables = ", ".join(
-            biosample["experimental_variables"]
-        )
-        export_im.biosample_extrinsic_variables = ", ".join(
-            biosample["extrinsic_variables"]
-        )
-        export_im.biosample_intrinsic_variables = ", ".join(
-            biosample["intrinsic_variables"]
-        )
-
     with open(output_fpath, "w") as fh:
-        fh.write(export_im.json(indent=2))
+        fh.write(converted_image.json(indent=2))
 
-    return export_im
+    return converted_image
 
 
-def fileref_to_export_annotations(fileref, use_cache=True):
+def fileref_to_export_annotations(fileref: api_models.FileReference, use_cache=True):
 
     output_dirpath = settings.cache_root_dirpath / "images"
     output_dirpath.mkdir(exist_ok=True, parents=True)
@@ -252,53 +94,12 @@ def fileref_to_export_annotations(fileref, use_cache=True):
     if use_cache and output_fpath.exists():
         return ExportImage.parse_file(output_fpath)
 
-    # reps_by_type = {
-    #     rep.type: rep
-    #     for rep in image.representations
-    # }
-
-    # ome_zarr_uri = reps_by_type["ome_ngff"].uri[0]
-    # im = ome_zarr_image_from_ome_zarr_uri(ome_zarr_uri)
-
-    # try:
-    #     thumbnail_uri=reps_by_type["thumbnail"].uri[0]
-    # except KeyError:
-    #     thumbnail_uri = ""
-
-    # FIXME - should generalise this
-    # source_image_uuid = image.attributes.get("source_image_uuid", None)
-    # source_image_thumbnail_uri = image.attributes.get("source_image_thumbnail_uri", None)
-    # overlay_image_uri = image.attributes.get("overlay_image_uri", None)
-
-    # export_ann = ExportAnnotationFile(
-    #     uuid=fileref.uuid,
-    #     name=Path(fileref.name).name,
-    #     alias=fileref.attributes.get("alias"),
-    #     thumbnail_uri=thumbnail_uri,
-    #     study_accession_id=study.accession_id,
-    #     study_title=study.title,
-    #     release_date=study.release_date,
-    #     itk_uri=ITK_BASE + reps_by_type["ome_ngff"].uri[0],
-    #     vizarr_uri=VIZARR_BASE + reps_by_type["ome_ngff"].uri[0],
-    #     sizeX=im.sizeX,
-    #     sizeY=im.sizeY,
-    #     sizeZ=im.sizeZ,
-    #     sizeT=im.sizeT,
-    #     sizeC=im.sizeC,
-    #     PhysicalSizeX=im.PhysicalSizeX,
-    #     PhysicalSizeY=im.PhysicalSizeY,
-    #     PhysicalSizeZ=im.PhysicalSizeZ,
-    #     source_image_uuid=source_image_uuid,
-    #     source_image_thumbnail_uri=source_image_thumbnail_uri,
-    #     overlay_image_uri=overlay_image_uri,
-    #     attributes=filter_image_attributes(image)
-    # )
-
     # FIXME - Write the proper export_ann
     export_ann = None
 
-    with open(output_fpath, "w") as fh:
-        fh.write(export_ann.json(indent=2))
+    if export_ann:
+        with open(output_fpath, "w") as fh:
+            fh.write(export_ann.json(indent=2))
 
     return export_ann
 
@@ -333,7 +134,7 @@ def study_uuid_to_export_dataset(study_uuid) -> ExportDataset:
 
 
 # FIXME - we get images twice...
-def study_uuid_to_export_sodataset(study_uuid) -> ExportSODataset:
+def study_uuid_to_export_sodataset(study_uuid: str) -> ExportSODataset:
 
     output_dirpath = settings.cache_root_dirpath / "datasets"
     output_dirpath.mkdir(exist_ok=True, parents=True)
@@ -361,7 +162,7 @@ def study_uuid_to_export_sodataset(study_uuid) -> ExportSODataset:
 
 
 # FIXME - we get images twice...
-def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
+def study_uuid_to_export_ai_dataset(study_uuid: str) -> ExportAIDataset:
 
     output_dirpath = settings.cache_root_dirpath / "datasets"
     output_dirpath.mkdir(exist_ok=True, parents=True)
@@ -407,42 +208,19 @@ def study_uuid_to_export_ai_dataset(study_uuid) -> ExportAIDataset:
     return ExportAIDataset(**transform_dict)
 
 
-def study_uuid_to_export_images(study_uuid):
+def study_uuid_to_export_images(study_uuid: str) -> dict[str, ExportImage]:
     study = rw_client.get_study(study_uuid)
     images = get_images_with_a_rep_type(study_uuid, "ome_ngff", limit=500)
 
     return {image.uuid: bia_image_to_export_image(image, study) for image in images}
 
 
-def get_annotation_files_by_study_uuid(study_uuid):
-    file_refs = get_file_references_by_study_uuid(study_uuid)
-    return {
-        fileref.uuid: fileref
-        for fileref in file_refs
-        if "source image" in fileref.attributes
-    }
-
-
-def get_ann_uuid_by_sourcename(annotation_files):
-    ann_aliases_by_sourcename = {}
-    for annfile in annotation_files.values():
-        if ann_aliases_by_sourcename.get(annfile.attributes["source image"]):
-            ann_aliases_by_sourcename[annfile.attributes["source image"]] += (
-                ", " + annfile.uuid
-            )
-        else:
-            ann_aliases_by_sourcename[annfile.attributes["source image"]] = annfile.uuid
-    return ann_aliases_by_sourcename
-
-
 @app.command()
 def show_export(accession_id: str):
     study_uuid = get_study_uuid_by_accession_id(accession_id)
-    api_study = rw_client.get_study(study_uuid)
 
     export_dataset = study_uuid_to_export_dataset(study_uuid)
 
-    # rich.print(api_study)
     rich.print(export_dataset)
 
 
@@ -465,10 +243,6 @@ def show_fileref_export(accession_id: str):
     rich.print(get_annotation_files_by_study_uuid(study_uuid))
 
 
-# @app.command()
-# def
-# def show_image_export(accession_id: str, image_relpath: str):
-# image = get_image_by_accession_id_and_relpath(accession_id, image_relpath)
 @app.command()
 def show_image_export(accession_id: str, image_uuid: str):
     study_uuid = get_study_uuid_by_accession_id(accession_id)

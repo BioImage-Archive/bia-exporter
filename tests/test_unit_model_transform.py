@@ -1,6 +1,5 @@
 from bia_export.cli import bia_image_to_export_image
 from bia_export.models import ExportImage
-from bia_export.scli import rw_client
 
 from bia_integrator_api import models as api_models
 
