@@ -70,7 +70,7 @@ def bia_image_to_export_image(
 
     # image->specimen should be 1->1, but have to assume 1->many because of 1->many image->image_acquisition link
     for image_acquisition in image_acquisitions:
-        specimen.append(rw_client.get_specimen(image_acquisition.specimen_uuid))
+        specimens.append(rw_client.get_specimen(image_acquisition.specimen_uuid))
 
     for specimen in specimens:
         biosamples.append(rw_client.get_biosample(specimen.biosample_uuid))
