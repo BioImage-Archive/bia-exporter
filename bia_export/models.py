@@ -95,8 +95,9 @@ class ExportAIDataset(BaseModel):
     image_uuids: List[str]
     links: List[Link] = []
     annfile_uuids: List[str]
-    corresponding_ann_uuids: Dict[str, str | None] = {}
-    corresponding_im_uuids: Dict[str, str | None] = {}
+    annotation_images: Dict[str, str | None] = {}
+    corresponding_source_im_ann_uuids: Dict[str, str | None] = {}
+    corresponding_ann_source_im_uuids: Dict[str, str | None] = {}
 
 
 class ExportSODataset(BaseModel):
