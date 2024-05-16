@@ -1,27 +1,47 @@
 import pytest
-import json
-import os
 from bia_integrator_api import models as api_models
 from bia_export.models import ExportImage
+from .utils import (
+    get_template_api_biosample,
+    get_template_api_image_acquisition,
+    get_template_api_specimen,
+    get_template_api_study,
+    get_template_api_image,
+    get_template_export_image,
+    add_image_representation,
+)
 
 
-def test_base() -> str:
-    return os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
-
-
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def bia_image() -> api_models.BIAImage:
-    with open(os.path.join(test_base(), "data/input", "bia_image.json")) as f:
-        return api_models.BIAImage(**json.load(f))
+    return get_template_api_image()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
+def bia_image_with_image_rep(bia_image) -> api_models.BIAImage:
+    return add_image_representation(bia_image)
+
+
+@pytest.fixture()
 def bia_study() -> api_models.BIAStudy:
-    with open(os.path.join(test_base(), "data/input", "bia_study.json")) as f:
-        return api_models.BIAStudy(**json.load(f))
+    return get_template_api_study()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
+def bia_image_acquisition() -> api_models.ImageAcquisition:
+    return get_template_api_image_acquisition()
+
+
+@pytest.fixture()
+def bia_specimen() -> api_models.Specimen:
+    return get_template_api_specimen()
+
+
+@pytest.fixture()
+def bia_biosample() -> api_models.Biosample:
+    return get_template_api_biosample()
+
+
+@pytest.fixture()
 def website_image() -> ExportImage:
-    with open(os.path.join(test_base(), "data/output", "website_image.json")) as f:
-        return ExportImage(**json.load(f))
+    return get_template_export_image()

@@ -4,7 +4,9 @@ from bia_export.proxyimage import OMEZarrImage
 import uuid
 
 
-def get_template_api_study(study_uuid=uuid.uuid4(), accession_id="S-BIAXXXX"):
+def get_template_api_study(
+    study_uuid=uuid.uuid4(), accession_id="S-BIAXXXX"
+) -> api_models.BIAStudy:
     placeholder_fields = {
         "uuid": str(study_uuid),
         "version": 0,
@@ -29,7 +31,7 @@ def get_template_api_study(study_uuid=uuid.uuid4(), accession_id="S-BIAXXXX"):
     return api_models.BIAStudy(**placeholder_fields)
 
 
-def get_template_api_biosample(biosample_uuid=uuid.uuid4()):
+def get_template_api_biosample(biosample_uuid=uuid.uuid4()) -> api_models.Biosample:
     placeholder_fields = {
         "uuid": str(biosample_uuid),
         "version": 0,
@@ -50,7 +52,9 @@ def get_template_api_biosample(biosample_uuid=uuid.uuid4()):
     return api_models.Biosample(**placeholder_fields)
 
 
-def get_template_api_specimen(specimen_uuid=uuid.uuid4(), biosample_uuid=uuid.uuid4()):
+def get_template_api_specimen(
+    specimen_uuid=uuid.uuid4(), biosample_uuid=uuid.uuid4()
+) -> api_models.Specimen:
     placeholder_fields = {
         "uuid": str(specimen_uuid),
         "version": 0,
@@ -68,7 +72,7 @@ def get_template_api_specimen(specimen_uuid=uuid.uuid4(), biosample_uuid=uuid.uu
 
 def get_template_api_image_acquisition(
     acquisition_uuid=uuid.uuid4(), specimen_uuid=uuid.uuid4()
-):
+) -> api_models.ImageAcquisition:
     placeholder_fields = {
         "uuid": str(acquisition_uuid),
         "version": 0,
@@ -85,7 +89,9 @@ def get_template_api_image_acquisition(
     return api_models.ImageAcquisition(**placeholder_fields)
 
 
-def get_template_api_image(image_uuid=uuid.uuid4(), study_uuid=uuid.uuid4()):
+def get_template_api_image(
+    image_uuid=uuid.uuid4(), study_uuid=uuid.uuid4()
+) -> api_models.BIAImage:
     placeholder_fields = {
         "uuid": str(image_uuid),
         "version": 0,
@@ -107,7 +113,7 @@ def get_template_api_image(image_uuid=uuid.uuid4(), study_uuid=uuid.uuid4()):
     return api_models.BIAImage(**placeholder_fields)
 
 
-def add_image_representation(image: api_models.BIAImage):
+def add_image_representation(image: api_models.BIAImage) -> api_models.BIAImage:
     ome_ngff_rep = {
         "size": 0,
         "uri": ["https://placeder.uri/file.zarr/0"],
@@ -120,7 +126,7 @@ def add_image_representation(image: api_models.BIAImage):
     return image
 
 
-def get_template_ome_zarr_image():
+def get_template_ome_zarr_image() -> OMEZarrImage:
     placeholder_fields = {
         "sizeX": 1,
         "sizeY": 1,
@@ -139,7 +145,9 @@ def get_template_ome_zarr_image():
     return OMEZarrImage(**placeholder_fields)
 
 
-def get_template_export_image(image_uuid=uuid.uuid4(), study_accession_id="S-BIAXXXX"):
+def get_template_export_image(
+    image_uuid=uuid.uuid4(), study_accession_id="S-BIAXXXX"
+) -> ExportImage:
     placeholder_fields = {
         "uuid": str(image_uuid),
         "name": "image_name_value",
