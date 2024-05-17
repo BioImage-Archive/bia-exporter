@@ -61,30 +61,38 @@ def get_image_by_accession_id_and_relpath(
 
 
 def get_file_references_by_study_uuid(
-    study_uuid: str,
+    study_uuid: str, limit=20
 ) -> list[api_models.FileReference]:
     file_references = rw_client.get_study_file_references(
-        study_uuid, limit=20, apply_annotations=True
+        study_uuid, limit=limit, apply_annotations=True
     )
     return file_references
 
+def get_images_by_study_uuid(
+    study_uuid: str, limit=20
+) -> list[api_models.FileReference]:
+    study_images = rw_client.get_study_images(
+        study_uuid, limit=limit, apply_annotations=True
+    )
+    return study_images
 
-def get_annotation_file_uuids_by_study_uuid(study_uuid: str) -> list[str]:
+
+def get_annotation_file_uuids_by_study_uuid(study_uuid: str, limit=20) -> list[str]:
     file_refs = rw_client.get_study_file_references(
-        study_uuid, limit=20, apply_annotations=True
+        study_uuid, limit=limit, apply_annotations=True
     )
 
     return [
         fileref.uuid
         for fileref in file_refs
-        if "source image" in fileref.attributes.keys()
+        if "source image" in fileref.attributes
     ]
 
 
 def get_annotation_files_by_study_uuid(
-    study_uuid: str,
+    study_uuid: str, limit=20
 ) -> dict[str, api_models.FileReference]:
-    file_refs = get_file_references_by_study_uuid(study_uuid)
+    file_refs = get_file_references_by_study_uuid(study_uuid, limit=limit)
     return {
         fileref.uuid: fileref
         for fileref in file_refs

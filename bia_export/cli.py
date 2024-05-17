@@ -22,6 +22,7 @@ from .bia_client_utils import (
     get_file_references_by_study_uuid,
     get_annotation_file_uuids_by_study_uuid,
     get_annotation_files_by_study_uuid,
+    get_images_by_study_uuid,
 )
 
 from .config import settings
@@ -172,7 +173,12 @@ def study_uuid_to_export_ai_dataset(study_uuid: str) -> ExportAIDataset:
 
     bia_study = rw_client.get_study(study_uuid, apply_annotations=True)
 
-    images = get_images_with_a_rep_type(study_uuid, "ome_ngff")
+    # Get OME-NGFF images only
+    images = get_images_with_a_rep_type(study_uuid, "ome_ngff",limit=10)
+    # Get all images
+    n_images = bia_study.images_count
+    study_images = get_images_by_study_uuid(study_uuid, limit=n_images)
+
     transform_dict = transform_ai_study_dict(bia_study)
     transform_dict["image_uuids"] = [image.uuid for image in images]
     transform_dict["links"] = [
@@ -183,24 +189,42 @@ def study_uuid_to_export_ai_dataset(study_uuid: str) -> ExportAIDataset:
         )
     ]
     transform_dict["annfile_uuids"] = get_annotation_file_uuids_by_study_uuid(
-        study_uuid
+        study_uuid, limit=100
     )
 
-    annotation_files = get_annotation_files_by_study_uuid(study_uuid)
+    # Get all annotations
+    # Assuming max = all file references
+    n_filereferences = bia_study.file_references_count
+    annotation_files = get_annotation_files_by_study_uuid(study_uuid, limit=n_filereferences)
 
     ann_uuids_by_sourcename = get_ann_uuid_by_sourcename(annotation_files)
     # rich.print(ann_uuids_by_sourcename)
 
-    transform_dict["corresponding_ann_uuids"] = {
-        image.uuid: ann_uuids_by_sourcename.get(image.name) for image in images
+    im_uuid_by_name = {image.name: image.uuid for image in study_images}
+
+    # Find annotations that are also images
+    annotation_images = { 
+        annfile.uuid: im_uuid_by_name.get(annfile.name) 
+        for annfile in annotation_files.values()
+        if im_uuid_by_name.get(annfile.name)                                
+    }
+    # Find images that are not annotations
+    nonannotation_images = [
+        image for image in study_images if image.uuid not in annotation_images.values()
+    ]
+
+    transform_dict["annotation_images"] = annotation_images
+
+    transform_dict["corresponding_source_im_ann_uuids"] = {
+        image.uuid: ann_uuids_by_sourcename.get(image.name) for image in nonannotation_images
     }
 
-    im_uuid_by_name = {image.name: image.uuid for image in images}
-
-    transform_dict["corresponding_im_uuids"] = {
+    transform_dict["corresponding_ann_source_im_uuids"] = {
         annfile.uuid: im_uuid_by_name.get(annfile.attributes["source image"])
         for annfile in annotation_files.values()
     }
+
+
 
     with open(output_fpath, "w") as fh:
         fh.write(ExportAIDataset(**transform_dict).json(indent=2))
